@@ -50,17 +50,20 @@ def get_animate_samples(conll, animate_file, use_v1, hack_v2):
             if tok.upos != "NOUN" or 'Gender' not in tok.feats or len(tok.feats['Gender']) != 1:
                 continue
             is_masc = next(iter(tok.feats['Gender'])) == 'Masc'
-            if tok.lemma in words:
+            if tok.form in words:
                 try:
-                    convert = get_fem_word(tok.lemma, lines) if is_masc else get_masc_word(tok.lemma, lines)
+                    convert = get_fem_word(tok.form, lines) if is_masc else get_masc_word(tok.form, lines)
                 except ValueError:
                     continue
                 changes.append((int(tok.id), convert, convert, not is_masc))
         changes_list = []
         for r in range(1, len(changes) + 1):
             changes_list.extend(combinations(changes, r))
-        for change in changes_list:
-            samples.append(SentenceConversion(deepcopy(sent), change, use_v1, hack_v2))
+
+        if len(changes_list) == 0:
+            samples.append(sent)
+        else:
+            samples.append(SentenceConversion(deepcopy(sent), changes_list[-1], use_v1, hack_v2))
     return samples
 
 

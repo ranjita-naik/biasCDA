@@ -5,6 +5,8 @@ from sigmorphon_reinflection.decode import get_decoding_model
 from sigmorphon_reinflection.reinflection_model import *
 from tqdm import tqdm
 from utils.conll import load_sentences
+from SentenceConversion import SentenceConversion
+from utils.data import sample_from_sentence, get_sentence_text
 
 def get_args():
     """
@@ -61,16 +63,17 @@ def main():
                 samples = get_animate_samples(conll, opt.animate_list, opt.use_v1, opt.hack_v2)
                 if opt.inc_input:
                     out.write(conll.conll())
-                del conll
-                print("     ", str(len(samples)), "animate nouns found")
 
                 # Convert gender of sentences
                 converted_sentences = []
                 print("    Converting sentences...")
                 for sc in tqdm(samples, total=len(samples)):
                     try:
-                        converted = sc.apply(model, psi, reinflection_model, device, decode_fn, decode_trg)
-                        converted_sentences.append(converted)
+                        if type(sc) == SentenceConversion:
+                            converted = sc.apply(model, psi, reinflection_model, device, decode_fn, decode_trg)
+                            converted_sentences.append(converted)
+                        else :
+                            converted_sentences.append(sc.conll())
                     except ValueError:
                         continue
                     except IndexError:
