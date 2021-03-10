@@ -75,8 +75,10 @@ def main():
                         else :
                             converted_sentences.append(sc.conll())
                     except ValueError:
+                        converted_sentences.append(sc.sentence.conll())
                         continue
                     except IndexError:
+                        converted_sentences.append(sc.sentence.conll())
                         continue
                 del samples
                 out.write("\n\n".join(converted_sentences) + "\n\n")
